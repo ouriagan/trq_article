@@ -1,12 +1,14 @@
 ---
 title: 'TRQ : structures factorielles'
 author: "Louis De Page et Benjamin Thiry"
-date: "2023-01-15"
+date: "2023-01-16"
 output:
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+    df_print: kable
   html_document:
     df_print: paged
-    toc: yes
-  pdf_document:
     toc: yes
   word_document:
     toc: yes
@@ -117,7 +119,7 @@ Le premier facteur compte `r n1_none_1` items.
 ### Facteur 1 : negative emotions
 
 ```{r}
-kable(facto1none_1table_ord)
+facto1none_1table_ord
 ```
 
 
@@ -384,7 +386,7 @@ plot(n_factors_promax_results)
 
 ```{r}
 facto1promax <- fa(items.df, nfactors=1, rotate="promax", use="pairwise")
-print(facto1promax$loadings,sort=TRUE,digits=2,cutoff=0.4)
+# print(facto1promax$loadings,sort=TRUE,digits=2,cutoff=0.4)
 fa.diagram(facto1promax)
 facto1promaxRMSEA <- round(facto1promax$RMSEA[["RMSEA"]],2) 
 facto1promaxrmsr <- round(facto1promax$rms,2)
@@ -1782,7 +1784,7 @@ kable(facto11promax_8table_ord)
 kable(facto11promax_9table_ord)
 ```
 
-### Facteur 10 : dexualized
+### Facteur 10 : sexualized
 
 ```{r}
 kable(facto11promax_10table_ord)
@@ -4922,7 +4924,9 @@ detach(itemsipse.df)
 # Congruence entre la modèle 11 varimax et le modèle 11 varimax ipsérisé
 
 ```{r}
-factor.congruence(facto11varimax,facto11vari_ipse)
+#factor.congruence(facto11varimax,facto11vari_ipse)
+factorcongruence.df <- as.data.frame(factor.congruence(facto11varimax,facto11vari_ipse))
+kable(factorcongruence.df)
 ```
 
 
