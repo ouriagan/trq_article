@@ -1,0 +1,565 @@
+---
+title: 'TRQ : structures factorielles'
+author: "Louis De Page et Benjamin Thiry"
+date: "2023-02-23"
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+  word_document:
+    toc: yes
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+    df_print: kable
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(psych)
+library(Hmisc)
+library(see)
+library(GPArotation)
+library(nFactors)
+library(FactoMineR)
+library(DiagrammeR)
+library(factoextra)
+library(parameters)
+library(kableExtra)
+library(ggplot2)
+library(openxlsx)
+library(corrplot)
+library(haven)
+library(readr)
+authors <- read_delim("C:/Users/Ouriagan/OneDrive/TRQ_article/authors.csv", delim = ";", escape_double = FALSE, na = "empty", trim_ws = TRUE)
+items <- read_sav("C:/Users/Ouriagan/OneDrive/TRQ_article/ct_14_12_2022.sav")
+items.df <- data.frame(items)
+# attach(ct_14_12_2022)
+# items.df <- data.frame(trq1,trq2,trq3,trq4,trq5,trq6,trq7,trq8,trq9,trq10,trq11,trq12,trq13,trq14,trq15,trq16,trq17,trq18,trq19,trq20,trq21,trq22,trq23,trq24,trq25,trq26,trq27,trq28,trq29,trq30,trq31,trq32,trq33,trq34,trq35,trq36,trq37,trq38,trq39,trq40,trq41,trq42,trq43,trq44,trq45,trq46,trq47,trq48,trq49,trq50,trq51,trq52,trq53,trq54,trq55,trq56,trq57,trq58,trq59,trq60,trq61,trq62,trq63,trq64,trq65,trq66,trq67,trq68,trq69,trq70,trq71,trq72,trq73,trq74,trq75,trq76,trq77,trq78,trq79)
+# detach(ct_14_12_2022)
+itemscomplete.df <- items.df[complete.cases(items.df), ]
+attach(items.df)
+
+
+N <- length(trq1)
+
+#Items mabels and the fonction to find them
+labels_items <- label(items.df)
+labels.df <- data.frame(Item=1:79, Label=labels_items)
+find_label <- function(x) {
+  label <- labels.df[labels.df$Item == x, "Label"]
+  return(label)
+}
+```
+
+# Nombre de facteurs dans la littérature précédente
+
+```{r authors, paged.print=TRUE}
+kbl(authors, booktabs = T)
+```
+
+
+# Rotation varimax
+
+N = `r N`
+
+## Very Simple Structure
+
+```{r}
+# itemscentres <- scale(items.df, center = TRUE) #Centre les variables sur 0
+vssmodelesfa <- vss(items.df, rotate = "varimax", use="pairwise")
+```
+
+Le Very Simple Structure criterion propose une solution à 3 voire 4 facteurs.
+
+
+## Method Agreement Procedure
+
+[n_factors](https://easystats.github.io/parameters/reference/n_factors.html) utilise 14 méthodes pour proposer la solution factorielle la plus fréquemment proposée :
+
+```{r}
+n_factors_varimax_results <- n_factors(items.df, type = "FA", rotation = "varimax")
+plot(n_factors_varimax_results)
+```
+
+
+
+## 2 facteurs
+
+```{r}
+facto2varimax <- fa(items.df, nfactors=2, rotate="varimax", use="pairwise")
+# print(facto2varimax$loadings,sort=TRUE,digits=2,cutoff=0.4)
+fa.diagram(facto2varimax)
+facto2varimaxRMSEA <- round(facto2varimax$RMSEA[["RMSEA"]],2) 
+facto2varimaxrmsr <- round(facto2varimax$rms,2)
+facto2varimaxTLI <- round(facto2varimax$TLI,2)
+facto2_1varimax_variance <- round(facto2varimax[["Vaccounted"]][2,1]*100,0) #obtenir la variance expliquée pour le facteur 1
+facto2_2varimax_variance <- round(facto2varimax[["Vaccounted"]][2,2]*100,0) #obtenir la variance expliquée pour le facteur 2
+facto2_2varimax_variancecum <- facto2_1varimax_variance+facto2_2varimax_variance
+
+# Distinguer les facteurs
+
+facto2varimax_1 <- which(abs(facto2varimax$loadings[,1]) > .30)
+facto2varimax_2 <- which(abs(facto2varimax$loadings[,2]) > .30)
+facto2varimax_1.df <- data.frame(facto2varimax_1)
+facto2varimax_2.df <- data.frame(facto2varimax_2)
+facto2varimax_1vect <- round(as.vector(facto2varimax$loadings[,1][facto2varimax_1]),2)
+facto2varimax_2vect <- round(as.vector(facto2varimax$loadings[,2][facto2varimax_2]),2)
+facto2varimax_1_labels <- apply(facto2varimax_1.df, 1, find_label)
+facto2varimax_2_labels <- apply(facto2varimax_2.df, 1, find_label)
+
+# Tableaux pour chaque facteur
+# 1
+facto2varimax_1table <- data.frame(Item=facto2varimax_1, Label=facto2varimax_1_labels, Loading=facto2varimax_1vect)
+facto2varimax_1table_ord <- facto2varimax_1table[order(facto2varimax_1vect, decreasing = TRUE),]
+#2
+facto2varimax_2table <- data.frame(Item=facto2varimax_2, Label=facto2varimax_2_labels, Loading=facto2varimax_2vect)
+facto2varimax_2table_ord <- facto2varimax_2table[order(facto2varimax_2vect, decreasing = TRUE),]
+
+# nombre d'items par facteurs
+n2_varimax_1 <- length(facto2varimax_1)
+n2_varimax_2 <- length(facto2varimax_2)
+n2_varimax <- n2_varimax_1+n2_varimax_2
+
+# Créer les scores factoriels
+scores2_varimax_1 <- facto2varimax$scores[,1]
+scores2_varimax_2 <- facto2varimax$scores[,2]
+```
+
+Le RMSEA est égal à `r facto2varimaxRMSEA`, le root mean square of the residuals (RMSR) est égal à `r facto2varimaxrmsr` (de préférence < .08) et le Tucker Lewis Index est égal à `r facto2varimaxTLI`.
+Le premier facteur explique `r facto2_1varimax_variance` %, le deuxième explique `r facto2_2varimax_variance` % de la variance totale pour une variance cumulée égale à `r facto2_2varimax_variancecum` %.
+Le premier facteur compte `r n2_varimax_1` items, le deuxième `r n2_varimax_2` items pour un total de `r n2_varimax` items.
+
+### Facteur 1 : negative emotions
+
+```{r warning=FALSE, include=FALSE}
+# alpha de Cronbach
+# créer une data-frame avec les items retenus
+rownamesfacto2_varimax_1 <- rownames(facto2varimax_1.df) #récupérer le nom des variables retenues
+items_facto2_varimax_1 <- subset(items.df, select = rownamesfacto2_varimax_1) # ne retenir que les items dont le nom à été récupéré
+
+items_facto2_varimax_1_alpharesults <- psych::alpha(items_facto2_varimax_1, check.keys=TRUE)
+items_facto2_varimax_1_alpha <- round(items_facto2_varimax_1_alpharesults$total$std.alpha, 2)
+items_facto2_varimax_1_alpha
+```
+
+**Alpha (standard) de Cronbach = `r items_facto2_varimax_1_alpha`**
+
+```{r}
+kbl(facto2varimax_1table_ord, booktabs = T) %>%
+kable_styling(full_width = T) %>%
+column_spec(3, width = "12cm")
+```
+
+### Facteur 2 : clinical involvement
+
+```{r warning=FALSE, include=FALSE}
+# alpha de Cronbach
+# créer une data-frame avec les items retenus
+rownamesfacto2_varimax_2 <- rownames(facto2varimax_2.df) #récupérer le nom des variables retenues
+items_facto2_varimax_2 <- subset(items.df, select = rownamesfacto2_varimax_2) # ne retenir que les items dont le nom à été récupéré
+
+items_facto2_varimax_2_alpharesults <- psych::alpha(items_facto2_varimax_2, check.keys=TRUE)
+items_facto2_varimax_2_alpha <- round(items_facto2_varimax_2_alpharesults$total$std.alpha, 2)
+items_facto2_varimax_2_alpha
+```
+
+**Alpha (standard) de Cronbach = `r items_facto2_varimax_2_alpha`**
+
+```{r}
+kbl(facto2varimax_2table_ord, booktabs = T) %>%
+kable_styling(full_width = T) %>%
+column_spec(3, width = "12cm")
+```
+
+### Statistiques descriptives
+
+Negative emotions = (trq8 + trq12 + trq22 + trq30 + trq39 + trq46 + trq2 + trq5 + trq15 + trq52 + trq13 + trq27 + trq36 + trq59 + trq68 + trq33 + trq34 + trq45 + trq75 + trq6 + trq51 + trq58 + trq78 + trq35 + trq44 + trq48 + trq55 + trq57 + trq16 + trq26 + trq63 + trq29 + trq37 + trq77 + trq62 + trq25 + trq10 + trq11 + trq70 + trq31 + trq60 + trq9 + trq24 + trq43 + trq38 + trq18 + trq73 + trq54 + (6-trq53) + (6-trq3) + (6-trq1)) / 51
+
+Clinical involvement = (trq3 + trq4 + trq7 + trq14 + trq19 + trq21 + trq23 + trq26 + trq28 + trq29 + trq31 + trq40 + trq42 + trq47 + trq49 + trq53 + trq56 + trq64 + trq65 + trq66 + trq67 + trq69 + trq71 + trq72 + trq73 + trq74 + trq76 + trq79) / 28 
+
+```{r}
+negativeemotions <- (trq8+trq12+trq22+trq30+trq39+trq46+trq2+trq5+trq15+trq52+trq13+trq27+trq36+trq59+trq68+trq33+trq34+trq45+trq75+trq6+trq51+trq58+trq78+trq35+trq44+trq48+trq55+trq57+trq16+trq26+trq63+trq29+trq37+trq77+trq62+trq25+trq10+trq11+trq70+trq31+trq60+trq9+trq24+trq43+trq38+trq18+trq73+trq54+(6-trq53)+(6-trq3)+(6-trq1))/51
+
+clinicalinvolvement <- (trq3+trq4+trq7+trq14+trq19+trq21+trq23+trq26+trq28+trq29+trq31+trq40+trq42+trq47+trq49+trq53+trq56+trq64+trq65+trq66+trq67+trq69+trq71+trq72+trq73+trq74+trq76+trq79)/28 
+
+trq53r <- (6-trq53)
+trq3r <- (6-trq3)
+trq1r <- (6-trq1)
+
+negativeemotions.df <- data.frame(trq8,trq12,trq22,trq30,trq39,trq46,trq2,trq5,trq15,trq52,trq13,trq27,trq36,trq59,trq68,trq33,trq34,trq45,trq75,trq6,trq51,trq58,trq78,trq35,trq44,trq48,trq55,trq57,trq16,trq26,trq63,trq29,trq37,trq77,trq62,trq25,trq10,trq11,trq70,trq31,trq60,trq9,trq24,trq43,trq38,trq18,trq73,trq54,trq53r,trq3r,trq1r)
+
+clinicalinvolvement.df <- data.frame(trq3,trq4,trq7,trq14,trq19,trq21,trq23,trq26,trq28,trq29,trq31,trq40,trq42,trq47,trq49,trq53,trq56,trq64,trq65,trq66,trq67,trq69,trq71,trq72,trq73,trq74,trq76,trq79)
+
+
+
+facto2_varimax_names <- c("Negative emotions", "Clinical involvement")
+facto2_varimax_mean <- c(mean(negativeemotions, na.rm = TRUE), mean(clinicalinvolvement, na.rm = TRUE))
+facto2_varimax_mean <- round(facto2_varimax_mean, 2)
+facto2_varimax_sd <- c(sd(negativeemotions, na.rm = TRUE), sd(clinicalinvolvement, na.rm = TRUE))
+facto2_varimax_sd <- round(facto2_varimax_sd,2)
+facto2_varimax_min = c(min(negativeemotions, na.rm = TRUE), min(clinicalinvolvement, na.rm = TRUE))
+facto2_varimax_min <- round(facto2_varimax_min,2)
+facto2_varimax_max = c(max(negativeemotions, na.rm = TRUE), max(clinicalinvolvement, na.rm = TRUE))
+facto2_varimax_max <- round(facto2_varimax_max,2)
+
+facto2_varimax_table <- data.frame(Variable=facto2_varimax_names, Mean=facto2_varimax_mean, SD=facto2_varimax_sd, Min=facto2_varimax_min, Max = facto2_varimax_max)
+```
+
+```{r statdescfacto2varimax, echo=FALSE}
+kbl(facto2_varimax_table, caption = "Descriptive statistics")
+```
+
+```{r, echo = FALSE, fig$ref(negativeemotions)}
+hist(negativeemotions,
+main="Negative emotions",
+xlab="Negative emotions",
+ylab="Frequency",
+border="black",
+col="grey",
+xlim=c(1,5))
+```
+
+```{r, echo = FALSE, fig$ref(clinicalinvolvement)}
+hist(clinicalinvolvement,
+main="Clinical involvement",
+xlab="Clinical involvement",
+ylab="Frequency",
+border="black",
+col="grey",
+xlim=c(1,5))
+```
+
+## 8 facteurs
+
+```{r}
+facto8varimax <- fa(items.df, nfactors=8, rotate="varimax", use="pairwise")
+# print(facto8varimax$loadings,sort=TRUE,digits=2,cutoff=0.4)
+fa.diagram(facto8varimax)
+facto8varimaxRMSEA <- round(facto8varimax$RMSEA[["RMSEA"]],2) 
+facto8varimaxrmsr <- round(facto8varimax$rms,2)
+facto8varimaxTLI <- round(facto8varimax$TLI,2)
+facto8_1varimax_variance <- round(facto8varimax[["Vaccounted"]][2,1]*100,0) #obtenir la variance expliquée pour le facteur 1
+facto8_2varimax_variance <- round(facto8varimax[["Vaccounted"]][2,2]*100,0) #obtenir la variance expliquée pour le facteur 2
+facto8_3varimax_variance <- round(facto8varimax[["Vaccounted"]][2,3]*100,0) #obtenir la variance expliquée pour le facteur 3
+facto8_4varimax_variance <- round(facto8varimax[["Vaccounted"]][2,4]*100,0) #obtenir la variance expliquée pour le facteur 4
+facto8_5varimax_variance <- round(facto8varimax[["Vaccounted"]][2,5]*100,0) #obtenir la variance expliquée pour le facteur 5
+facto8_6varimax_variance <- round(facto8varimax[["Vaccounted"]][2,6]*100,0) #obtenir la variance expliquée pour le facteur 6
+facto8_7varimax_variance <- round(facto8varimax[["Vaccounted"]][2,7]*100,0) #obtenir la variance expliquée pour le facteur 7
+facto8_8varimax_variance <- round(facto8varimax[["Vaccounted"]][2,8]*100,0) #obtenir la variance expliquée pour le facteur 8
+
+facto8varimax_variancecum <- facto8_1varimax_variance+facto8_2varimax_variance+facto8_3varimax_variance+ facto8_4varimax_variance+facto8_5varimax_variance+facto8_6varimax_variance+facto8_7varimax_variance+facto8_8varimax_variance
+
+# Distinguer les facteurs
+
+facto8varimax_1 <- which(abs(facto8varimax$loadings[,1]) > .30)
+facto8varimax_2 <- which(abs(facto8varimax$loadings[,2]) > .30)
+facto8varimax_3 <- which(abs(facto8varimax$loadings[,3]) > .30)
+facto8varimax_4 <- which(abs(facto8varimax$loadings[,4]) > .30)
+facto8varimax_5 <- which(abs(facto8varimax$loadings[,5]) > .30)
+facto8varimax_6 <- which(abs(facto8varimax$loadings[,6]) > .30)
+facto8varimax_7 <- which(abs(facto8varimax$loadings[,7]) > .30)
+facto8varimax_8 <- which(abs(facto8varimax$loadings[,8]) > .30)
+
+facto8varimax_1.df <- data.frame(facto8varimax_1)
+facto8varimax_2.df <- data.frame(facto8varimax_2)
+facto8varimax_3.df <- data.frame(facto8varimax_3)
+facto8varimax_4.df <- data.frame(facto8varimax_4)
+facto8varimax_5.df <- data.frame(facto8varimax_5)
+facto8varimax_6.df <- data.frame(facto8varimax_6)
+facto8varimax_7.df <- data.frame(facto8varimax_7)
+facto8varimax_8.df <- data.frame(facto8varimax_8)
+
+facto8varimax_1vect <- round(as.vector(facto8varimax$loadings[,1][facto8varimax_1]),2)
+facto8varimax_2vect <- round(as.vector(facto8varimax$loadings[,2][facto8varimax_2]),2)
+facto8varimax_3vect <- round(as.vector(facto8varimax$loadings[,3][facto8varimax_3]),2)
+facto8varimax_4vect <- round(as.vector(facto8varimax$loadings[,4][facto8varimax_4]),2)
+facto8varimax_5vect <- round(as.vector(facto8varimax$loadings[,5][facto8varimax_5]),2)
+facto8varimax_6vect <- round(as.vector(facto8varimax$loadings[,6][facto8varimax_6]),2)
+facto8varimax_7vect <- round(as.vector(facto8varimax$loadings[,7][facto8varimax_7]),2)
+facto8varimax_8vect <- round(as.vector(facto8varimax$loadings[,8][facto8varimax_8]),2)
+
+facto8varimax_1_labels <- apply(facto8varimax_1.df, 1, find_label)
+facto8varimax_2_labels <- apply(facto8varimax_2.df, 1, find_label)
+facto8varimax_3_labels <- apply(facto8varimax_3.df, 1, find_label)
+facto8varimax_4_labels <- apply(facto8varimax_4.df, 1, find_label)
+facto8varimax_5_labels <- apply(facto8varimax_5.df, 1, find_label)
+facto8varimax_6_labels <- apply(facto8varimax_6.df, 1, find_label)
+facto8varimax_7_labels <- apply(facto8varimax_7.df, 1, find_label)
+facto8varimax_8_labels <- apply(facto8varimax_8.df, 1, find_label)
+
+# Tableaux pour chaque facteur
+# 1
+facto8varimax_1table <- data.frame(Item=facto8varimax_1, Label=facto8varimax_1_labels, Loading=facto8varimax_1vect)
+facto8varimax_1table_ord <- facto8varimax_1table[order(facto8varimax_1vect, decreasing = TRUE),]
+#2
+facto8varimax_2table <- data.frame(Item=facto8varimax_2, Label=facto8varimax_2_labels, Loading=facto8varimax_2vect)
+facto8varimax_2table_ord <- facto8varimax_2table[order(facto8varimax_2vect, decreasing = TRUE),]
+#3
+facto8varimax_3table <- data.frame(Item=facto8varimax_3, Label=facto8varimax_3_labels, Loading=facto8varimax_3vect)
+facto8varimax_3table_ord <- facto8varimax_3table[order(facto8varimax_3vect, decreasing = TRUE),]
+#4
+facto8varimax_4table <- data.frame(Item=facto8varimax_4, Label=facto8varimax_4_labels, Loading=facto8varimax_4vect)
+facto8varimax_4table_ord <- facto8varimax_4table[order(facto8varimax_4vect, decreasing = TRUE),]
+#5
+facto8varimax_5table <- data.frame(Item=facto8varimax_5, Label=facto8varimax_5_labels, Loading=facto8varimax_5vect)
+facto8varimax_5table_ord <- facto8varimax_5table[order(facto8varimax_5vect, decreasing = TRUE),]
+#6
+facto8varimax_6table <- data.frame(Item=facto8varimax_6, Label=facto8varimax_6_labels, Loading=facto8varimax_6vect)
+facto8varimax_6table_ord <- facto8varimax_6table[order(facto8varimax_6vect, decreasing = TRUE),]
+#7
+facto8varimax_7table <- data.frame(Item=facto8varimax_7, Label=facto8varimax_7_labels, Loading=facto8varimax_7vect)
+facto8varimax_7table_ord <- facto8varimax_7table[order(facto8varimax_7vect, decreasing = TRUE),]
+#8
+facto8varimax_8table <- data.frame(Item=facto8varimax_8, Label=facto8varimax_8_labels, Loading=facto8varimax_8vect)
+facto8varimax_8table_ord <- facto8varimax_8table[order(facto8varimax_8vect, decreasing = TRUE),]
+
+
+# nombre d'items par facteurs
+n8_varimax_1 <- length(facto8varimax_1)
+n8_varimax_2 <- length(facto8varimax_2)
+n8_varimax_3 <- length(facto8varimax_3)
+n8_varimax_4 <- length(facto8varimax_4)
+n8_varimax_5 <- length(facto8varimax_5)
+n8_varimax_6 <- length(facto8varimax_6)
+n8_varimax_7 <- length(facto8varimax_7)
+n8_varimax_8 <- length(facto8varimax_8)
+
+n8_varimax <- n8_varimax_1+n8_varimax_2+n8_varimax_3+n8_varimax_4+n8_varimax_5+n8_varimax_6+n8_varimax_7+n8_varimax_8
+
+# Créer les scores factoriels
+scores8_varimax_1 <- facto8varimax$scores[,1]
+scores8_varimax_2 <- facto8varimax$scores[,2]
+scores8_varimax_3 <- facto8varimax$scores[,3]
+scores8_varimax_4 <- facto8varimax$scores[,4]
+scores8_varimax_5 <- facto8varimax$scores[,5]
+scores8_varimax_6 <- facto8varimax$scores[,6]
+scores8_varimax_7 <- facto8varimax$scores[,7]
+scores8_varimax_8 <- facto8varimax$scores[,8]
+```
+
+Le RMSEA est égal à `r facto8varimaxRMSEA`, le root mean square of the residuals (RMSR) est égal à `r facto8varimaxrmsr` (de préférence < .08) et le Tucker Lewis Index est égal à `r facto8varimaxTLI`.
+Le premier facteur explique `r facto8_1varimax_variance` %, le deuxième explique `r facto8_2varimax_variance` %, le troisième `r facto8_3varimax_variance` %, le quatrième `r facto8_4varimax_variance` %, le cinquième `r facto8_5varimax_variance` % , le sixième `r facto8_6varimax_variance` %, le septième `r facto8_7varimax_variance` %, le huitième `r facto8_8varimax_variance` %  de la variance totale pour une variance cumulée égale à `r facto8varimax_variancecum` %.
+Le premier facteur compte `r n8_varimax_1` items, le deuxième `r n8_varimax_2` items le troisième `r n8_varimax_3` items, le quatrième `r n8_varimax_4` items, le cinquième `r n8_varimax_5` items, le sixième `r n8_varimax_6` items, le septième `r n8_varimax_7` items, le huitième `r n8_varimax_8` items pour un total de `r n8_varimax` items.
+
+### Facteur 1 : mistreated
+
+```{r warning=FALSE, include=FALSE}
+# alpha de Cronbach
+# créer une data-frame avec les items retenus
+rownamesfacto8_varimax_1 <- rownames(facto8varimax_1.df) #récupérer le nom des variables retenues
+items_facto8_varimax_1 <- subset(items.df, select = rownamesfacto8_varimax_1) # ne retenir que les items dont le nom à été récupéré
+
+items_facto8_varimax_1_alpharesults <- psych::alpha(items_facto8_varimax_1, check.keys=TRUE)
+items_facto8_varimax_1_alpha <- round(items_facto8_varimax_1_alpharesults$total$std.alpha, 2)
+items_facto8_varimax_1_alpha
+```
+
+**Alpha (standard) de Cronbach = `r items_facto8_varimax_1_alpha`**
+
+```{r}
+kbl(facto8varimax_1table_ord, booktabs = T) %>%
+kable_styling(full_width = T) %>%
+column_spec(3, width = "12cm")
+```
+
+### Facteur 2 : protective
+
+```{r warning=FALSE, include=FALSE}
+# alpha de Cronbach
+# créer une data-frame avec les items retenus
+rownamesfacto8_varimax_2 <- rownames(facto8varimax_2.df) #récupérer le nom des variables retenues
+items_facto8_varimax_2 <- subset(items.df, select = rownamesfacto8_varimax_2) # ne retenir que les items dont le nom à été récupéré
+
+items_facto8_varimax_2_alpharesults <- psych::alpha(items_facto8_varimax_2, check.keys=TRUE)
+items_facto8_varimax_2_alpha <- round(items_facto8_varimax_2_alpharesults$total$std.alpha, 2)
+items_facto8_varimax_2_alpha
+```
+
+**Alpha (standard) de Cronbach = `r items_facto8_varimax_2_alpha`**
+
+```{r}
+kbl(facto8varimax_2table_ord, booktabs = T) %>%
+kable_styling(full_width = T) %>%
+column_spec(3, width = "12cm")
+```
+
+### Facteur 3 : anger
+
+```{r warning=FALSE, include=FALSE}
+# alpha de Cronbach
+# créer une data-frame avec les items retenus
+rownamesfacto8_varimax_3 <- rownames(facto8varimax_3.df) #récupérer le nom des variables retenues
+items_facto8_varimax_3 <- subset(items.df, select = rownamesfacto8_varimax_3) # ne retenir que les items dont le nom à été récupéré
+
+items_facto8_varimax_3_alpharesults <- psych::alpha(items_facto8_varimax_3, check.keys=TRUE)
+items_facto8_varimax_3_alpha <- round(items_facto8_varimax_3_alpharesults$total$std.alpha, 2)
+items_facto8_varimax_3_alpha
+```
+
+**Alpha (standard) de Cronbach = `r items_facto8_varimax_3_alpha`**
+
+```{r}
+kbl(facto8varimax_3table_ord, booktabs = T) %>%
+kable_styling(full_width = T) %>%
+column_spec(3, width = "12cm")
+```
+
+### Facteur 4 : boredom
+
+```{r warning=FALSE, include=FALSE}
+# alpha de Cronbach
+# créer une data-frame avec les items retenus
+rownamesfacto8_varimax_4 <- rownames(facto8varimax_4.df) #récupérer le nom des variables retenues
+items_facto8_varimax_4 <- subset(items.df, select = rownamesfacto8_varimax_4) # ne retenir que les items dont le nom à été récupéré
+
+items_facto8_varimax_4_alpharesults <- psych::alpha(items_facto8_varimax_4, check.keys=TRUE)
+items_facto8_varimax_4_alpha <- round(items_facto8_varimax_4_alpharesults$total$std.alpha, 2)
+items_facto8_varimax_4_alpha
+```
+
+**Alpha (standard) de Cronbach = `r items_facto8_varimax_4_alpha`**
+
+```{r}
+kbl(facto8varimax_4table_ord, booktabs = T) %>%
+kable_styling(full_width = T) %>%
+column_spec(3, width = "12cm")
+```
+
+### Facteur 5 : loss of professional distance
+
+```{r warning=FALSE, include=FALSE}
+# alpha de Cronbach
+# créer une data-frame avec les items retenus
+rownamesfacto8_varimax_5 <- rownames(facto8varimax_5.df) #récupérer le nom des variables retenues
+items_facto8_varimax_5 <- subset(items.df, select = rownamesfacto8_varimax_5) # ne retenir que les items dont le nom à été récupéré
+
+items_facto8_varimax_5_alpharesults <- psych::alpha(items_facto8_varimax_5, check.keys=TRUE)
+items_facto8_varimax_5_alpha <- round(items_facto8_varimax_5_alpharesults$total$std.alpha, 2)
+items_facto8_varimax_5_alpha
+```
+
+**Alpha (standard) de Cronbach = `r items_facto8_varimax_5_alpha`**
+
+```{r}
+kbl(facto8varimax_5table_ord, booktabs = T) %>%
+kable_styling(full_width = T) %>%
+column_spec(3, width = "12cm")
+```
+
+### Facteur 6 : disengaged
+
+```{r warning=FALSE, include=FALSE}
+# alpha de Cronbach
+# créer une data-frame avec les items retenus
+rownamesfacto8_varimax_6 <- rownames(facto8varimax_6.df) #récupérer le nom des variables retenues
+items_facto8_varimax_6 <- subset(items.df, select = rownamesfacto8_varimax_6) # ne retenir que les items dont le nom à été récupéré
+
+items_facto8_varimax_6_alpharesults <- psych::alpha(items_facto8_varimax_6, check.keys=TRUE)
+items_facto8_varimax_6_alpha <- round(items_facto8_varimax_6_alpharesults$total$std.alpha, 2)
+items_facto8_varimax_6_alpha
+```
+
+**Alpha (standard) de Cronbach = `r items_facto8_varimax_6_alpha`**
+
+```{r}
+kbl(facto8varimax_6table_ord, booktabs = T) %>%
+kable_styling(full_width = T) %>%
+column_spec(3, width = "12cm")
+```
+
+### Facteur 7 : sexualized
+
+```{r warning=FALSE, include=FALSE}
+# alpha de Cronbach
+# créer une data-frame avec les items retenus
+rownamesfacto8_varimax_7 <- rownames(facto8varimax_7.df) #récupérer le nom des variables retenues
+items_facto8_varimax_7 <- subset(items.df, select = rownamesfacto8_varimax_7) # ne retenir que les items dont le nom à été récupéré
+
+items_facto8_varimax_7_alpharesults <- psych::alpha(items_facto8_varimax_7, check.keys=TRUE)
+items_facto8_varimax_7_alpha <- round(items_facto8_varimax_7_alpharesults$total$std.alpha, 2)
+items_facto8_varimax_7_alpha
+```
+
+**Alpha (standard) de Cronbach = `r items_facto8_varimax_7_alpha`**
+
+```{r}
+kbl(facto8varimax_7table_ord, booktabs = T) %>%
+kable_styling(full_width = T) %>%
+column_spec(3, width = "12cm")
+```
+
+### Facteur 8 : distrust
+
+```{r warning=FALSE, include=FALSE}
+# alpha de Cronbach
+# créer une data-frame avec les items retenus
+rownamesfacto8_varimax_8 <- rownames(facto8varimax_8.df) #récupérer le nom des variables retenues
+items_facto8_varimax_8 <- subset(items.df, select = rownamesfacto8_varimax_8) # ne retenir que les items dont le nom à été récupéré
+
+items_facto8_varimax_8_alpharesults <- psych::alpha(items_facto8_varimax_8, check.keys=TRUE)
+items_facto8_varimax_8_alpha <- round(items_facto8_varimax_8_alpharesults$total$std.alpha, 2)
+items_facto8_varimax_8_alpha
+```
+
+**Alpha (standard) de Cronbach = `r items_facto8_varimax_8_alpha`**
+
+```{r}
+kbl(facto8varimax_8table_ord, booktabs = T) %>%
+kable_styling(full_width = T) %>%
+column_spec(3, width = "12cm")
+```
+
+### Calcul des facteurs
+
+Mistreated = ((6-trq1) + trq5 + trq6 + trq10 + trq12 + trq13 + trq15 + trq22 + trq26 + trq29 + trq30 + trq31 + trq33 + trq34 + trq35 + trq36 + trq38 + trq39 + trq44 + trq45 + trq46 + trq51 + trq52 + trq54 + trq55 + trq58 + trq59 + trq60 + trq63 + trq68 + trq75 + trq77 + trq78) / 33
+
+Protective = (trq1 + trq3 + trq4 + trq7 + trq19 + trq21 + trq23 + trq28 + trq40 + trq42 + trq47 + trq49 + trq53 + trq64 + trq65 + trq66 + trq67 + trq69 + trq71 + trq74 + trq76 + trq79) / 22
+
+Anger = (trq2 + trq8 + trq12 + trq15 + trq24 + trq25 + trq27 + trq29 + trq37 + trq39 + trq41 + trq43 + trq44 + trq45 + trq48 + trq55 + trq57) / 17
+
+Boredom = ((6-trq1) + (6-trq3) + trq8 + trq9 + trq10 + trq16 + trq18 + trq22 + trq25 + trq31 + trq36 + trq52 + trq68 + trq75) / 14
+
+Loss of professional distance = (trq56 + trq66 + trq67 + trq69 + trq71 + trq72 + trq73 + trq76 + trq77 + trq79) / 10
+
+Disengaged = (trq60 + trq70 + trq75 + trq78) / 4
+
+Sexualized = (trq7 + trq17 + trq32 + trq50 + trq56 + trq61 + trq71 + trq76) / 8
+
+Distrust = (trq11 + trq33 + trq41 + trq55) / 4
+
+```{r}
+mistreated <- ((6-trq1) + trq5 + trq6 + trq10 + trq12 + trq13 + trq15 + trq22 + trq26 + trq29 + trq30 + trq31 + trq33 + trq34 + trq35 + trq36 + trq38 + trq39 + trq44 + trq45 + trq46 + trq51 + trq52 + trq54 + trq55 + trq58 + trq59 + trq60 + trq63 + trq68 + trq75 + trq77 + trq78) / 33
+
+protective <- (trq1 + trq3 + trq4 + trq7 + trq19 + trq21 + trq23 + trq28 + trq40 + trq42 + trq47 + trq49 + trq53 + trq64 + trq65 + trq66 + trq67 + trq69 + trq71 + trq74 + trq76 + trq79) / 22
+
+anger <- (trq2 + trq8 + trq12 + trq15 + trq24 + trq25 + trq27 + trq29 + trq37 + trq39 + trq41 + trq43 + trq44 + trq45 + trq48 + trq55 + trq57) / 17
+
+boredom <- ((6-trq1) + (6-trq3) + trq8 + trq9 + trq10 + trq16 + trq18 + trq22 + trq25 + trq31 + trq36 + trq52 + trq68 + trq75) / 14
+
+lossofprofessionaldistance <- (trq56 + trq66 + trq67 + trq69 + trq71 + trq72 + trq73 + trq76 + trq77 + trq79) / 10
+
+disengaged <- (trq60 + trq70 + trq75 + trq78) / 4
+
+sexualized <- (trq7 + trq17 + trq32 + trq50 + trq56 + trq61 + trq71 + trq76) / 8
+
+distrust <- (trq11 + trq33 + trq41 + trq55) / 4
+```
+
+```{r}
+facto8_varimax_names <- c("Mistreated", "Protective", "Anger", "Boredom", "Loss of professional distance", "Disengaged", "Sexualized", "Distrust")
+facto8_varimax_mean <- c(mean(mistreated, na.rm = TRUE), mean(protective, na.rm = TRUE), mean(anger, na.rm = TRUE), mean(boredom, na.rm = TRUE), mean(lossofprofessionaldistance, na.rm = TRUE), mean(disengaged, na.rm = TRUE), mean(sexualized, na.rm = TRUE), mean(distrust, na.rm = TRUE))
+facto8_varimax_mean <- round(facto8_varimax_mean, 2)
+facto8_varimax_sd <- c(sd(mistreated, na.rm = TRUE), sd(protective, na.rm = TRUE), sd(anger, na.rm = TRUE), sd(boredom, na.rm = TRUE), sd(lossofprofessionaldistance, na.rm = TRUE), sd(disengaged, na.rm = TRUE), sd(sexualized, na.rm = TRUE), sd(distrust, na.rm = TRUE))
+facto8_varimax_sd <- round(facto8_varimax_sd,2)
+facto8_varimax_min = c(min(mistreated, na.rm = TRUE), min(protective, na.rm = TRUE), min(anger, na.rm = TRUE), min(boredom, na.rm = TRUE), min(lossofprofessionaldistance, na.rm = TRUE), min(disengaged, na.rm = TRUE), min(sexualized, na.rm = TRUE), min(distrust, na.rm = TRUE))
+facto8_varimax_min <- round(facto8_varimax_min,2)
+facto8_varimax_max = c(max(mistreated, na.rm = TRUE), max(protective, na.rm = TRUE), max(anger, na.rm = TRUE), max(boredom, na.rm = TRUE), max(lossofprofessionaldistance, na.rm = TRUE), max(disengaged, na.rm = TRUE), max(sexualized, na.rm = TRUE), max(distrust, na.rm = TRUE))
+facto8_varimax_max <- round(facto8_varimax_max,2)
+
+facto8_varimax_table <- data.frame(Variable=facto8_varimax_names, Mean=facto8_varimax_mean, SD=facto8_varimax_sd, Min=facto8_varimax_min, Max = facto8_varimax_max)
+```
+
+```{r statdescfacto8varimax, echo=FALSE}
+kbl(facto8_varimax_table, caption = "Descriptive statistics")
+```
