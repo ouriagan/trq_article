@@ -3,15 +3,15 @@ title: 'TRQ : structures factorielles'
 author: "Louis De Page et Benjamin Thiry"
 date: "2023-02-23"
 output:
-  html_document:
-    df_print: paged
-    toc: yes
-  word_document:
-    toc: yes
   pdf_document:
     toc: yes
     toc_depth: 3
     df_print: kable
+  word_document:
+    toc: yes
+  html_document:
+    df_print: paged
+    toc: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -84,7 +84,7 @@ plot(n_factors_varimax_results)
 
 
 
-## 2 facteurs
+## 2 factors
 
 ```{r}
 facto2varimax <- fa(items.df, nfactors=2, rotate="varimax", use="pairwise")
@@ -130,7 +130,7 @@ Le RMSEA est égal à `r facto2varimaxRMSEA`, le root mean square of the residua
 Le premier facteur explique `r facto2_1varimax_variance` %, le deuxième explique `r facto2_2varimax_variance` % de la variance totale pour une variance cumulée égale à `r facto2_2varimax_variancecum` %.
 Le premier facteur compte `r n2_varimax_1` items, le deuxième `r n2_varimax_2` items pour un total de `r n2_varimax` items.
 
-### Facteur 1 : negative emotions
+### Factor 1 : negative emotions
 
 ```{r warning=FALSE, include=FALSE}
 # alpha de Cronbach
@@ -151,7 +151,7 @@ kable_styling(full_width = T) %>%
 column_spec(3, width = "12cm")
 ```
 
-### Facteur 2 : clinical involvement
+### Factor 2 : clinical involvement
 
 ```{r warning=FALSE, include=FALSE}
 # alpha de Cronbach
@@ -172,11 +172,11 @@ kable_styling(full_width = T) %>%
 column_spec(3, width = "12cm")
 ```
 
-### Statistiques descriptives
+### Calculations
 
-Negative emotions = (trq8 + trq12 + trq22 + trq30 + trq39 + trq46 + trq2 + trq5 + trq15 + trq52 + trq13 + trq27 + trq36 + trq59 + trq68 + trq33 + trq34 + trq45 + trq75 + trq6 + trq51 + trq58 + trq78 + trq35 + trq44 + trq48 + trq55 + trq57 + trq16 + trq26 + trq63 + trq29 + trq37 + trq77 + trq62 + trq25 + trq10 + trq11 + trq70 + trq31 + trq60 + trq9 + trq24 + trq43 + trq38 + trq18 + trq73 + trq54 + (6-trq53) + (6-trq3) + (6-trq1)) / 51
+**Negative emotions** = (trq8 + trq12 + trq22 + trq30 + trq39 + trq46 + trq2 + trq5 + trq15 + trq52 + trq13 + trq27 + trq36 + trq59 + trq68 + trq33 + trq34 + trq45 + trq75 + trq6 + trq51 + trq58 + trq78 + trq35 + trq44 + trq48 + trq55 + trq57 + trq16 + trq26 + trq63 + trq29 + trq37 + trq77 + trq62 + trq25 + trq10 + trq11 + trq70 + trq31 + trq60 + trq9 + trq24 + trq43 + trq38 + trq18 + trq73 + trq54 + (6-trq53) + (6-trq3) + (6-trq1)) / 51
 
-Clinical involvement = (trq3 + trq4 + trq7 + trq14 + trq19 + trq21 + trq23 + trq26 + trq28 + trq29 + trq31 + trq40 + trq42 + trq47 + trq49 + trq53 + trq56 + trq64 + trq65 + trq66 + trq67 + trq69 + trq71 + trq72 + trq73 + trq74 + trq76 + trq79) / 28 
+**Clinical involvement** = (trq3 + trq4 + trq7 + trq14 + trq19 + trq21 + trq23 + trq26 + trq28 + trq29 + trq31 + trq40 + trq42 + trq47 + trq49 + trq53 + trq56 + trq64 + trq65 + trq66 + trq67 + trq69 + trq71 + trq72 + trq73 + trq74 + trq76 + trq79) / 28 
 
 ```{r}
 negativeemotions <- (trq8+trq12+trq22+trq30+trq39+trq46+trq2+trq5+trq15+trq52+trq13+trq27+trq36+trq59+trq68+trq33+trq34+trq45+trq75+trq6+trq51+trq58+trq78+trq35+trq44+trq48+trq55+trq57+trq16+trq26+trq63+trq29+trq37+trq77+trq62+trq25+trq10+trq11+trq70+trq31+trq60+trq9+trq24+trq43+trq38+trq18+trq73+trq54+(6-trq53)+(6-trq3)+(6-trq1))/51
@@ -191,8 +191,6 @@ negativeemotions.df <- data.frame(trq8,trq12,trq22,trq30,trq39,trq46,trq2,trq5,t
 
 clinicalinvolvement.df <- data.frame(trq3,trq4,trq7,trq14,trq19,trq21,trq23,trq26,trq28,trq29,trq31,trq40,trq42,trq47,trq49,trq53,trq56,trq64,trq65,trq66,trq67,trq69,trq71,trq72,trq73,trq74,trq76,trq79)
 
-
-
 facto2_varimax_names <- c("Negative emotions", "Clinical involvement")
 facto2_varimax_mean <- c(mean(negativeemotions, na.rm = TRUE), mean(clinicalinvolvement, na.rm = TRUE))
 facto2_varimax_mean <- round(facto2_varimax_mean, 2)
@@ -206,9 +204,13 @@ facto2_varimax_max <- round(facto2_varimax_max,2)
 facto2_varimax_table <- data.frame(Variable=facto2_varimax_names, Mean=facto2_varimax_mean, SD=facto2_varimax_sd, Min=facto2_varimax_min, Max = facto2_varimax_max)
 ```
 
+### Descriptive statistics 
+
 ```{r statdescfacto2varimax, echo=FALSE}
 kbl(facto2_varimax_table, caption = "Descriptive statistics")
 ```
+
+### Distributions
 
 ```{r, echo = FALSE, fig$ref(negativeemotions)}
 hist(negativeemotions,
@@ -230,7 +232,7 @@ col="grey",
 xlim=c(1,5))
 ```
 
-## 8 facteurs
+## 8 factors
 
 ```{r}
 facto8varimax <- fa(items.df, nfactors=8, rotate="varimax", use="pairwise")
@@ -342,7 +344,7 @@ Le RMSEA est égal à `r facto8varimaxRMSEA`, le root mean square of the residua
 Le premier facteur explique `r facto8_1varimax_variance` %, le deuxième explique `r facto8_2varimax_variance` %, le troisième `r facto8_3varimax_variance` %, le quatrième `r facto8_4varimax_variance` %, le cinquième `r facto8_5varimax_variance` % , le sixième `r facto8_6varimax_variance` %, le septième `r facto8_7varimax_variance` %, le huitième `r facto8_8varimax_variance` %  de la variance totale pour une variance cumulée égale à `r facto8varimax_variancecum` %.
 Le premier facteur compte `r n8_varimax_1` items, le deuxième `r n8_varimax_2` items le troisième `r n8_varimax_3` items, le quatrième `r n8_varimax_4` items, le cinquième `r n8_varimax_5` items, le sixième `r n8_varimax_6` items, le septième `r n8_varimax_7` items, le huitième `r n8_varimax_8` items pour un total de `r n8_varimax` items.
 
-### Facteur 1 : mistreated
+### Factor 1 : mistreated
 
 ```{r warning=FALSE, include=FALSE}
 # alpha de Cronbach
@@ -363,7 +365,7 @@ kable_styling(full_width = T) %>%
 column_spec(3, width = "12cm")
 ```
 
-### Facteur 2 : protective
+### Factor 2 : protective
 
 ```{r warning=FALSE, include=FALSE}
 # alpha de Cronbach
@@ -384,7 +386,7 @@ kable_styling(full_width = T) %>%
 column_spec(3, width = "12cm")
 ```
 
-### Facteur 3 : anger
+### Factor 3 : anger
 
 ```{r warning=FALSE, include=FALSE}
 # alpha de Cronbach
@@ -405,7 +407,7 @@ kable_styling(full_width = T) %>%
 column_spec(3, width = "12cm")
 ```
 
-### Facteur 4 : boredom
+### Factor 4 : boredom
 
 ```{r warning=FALSE, include=FALSE}
 # alpha de Cronbach
@@ -426,7 +428,7 @@ kable_styling(full_width = T) %>%
 column_spec(3, width = "12cm")
 ```
 
-### Facteur 5 : loss of professional distance
+### Factor 5 : loss of professional distance
 
 ```{r warning=FALSE, include=FALSE}
 # alpha de Cronbach
@@ -447,7 +449,7 @@ kable_styling(full_width = T) %>%
 column_spec(3, width = "12cm")
 ```
 
-### Facteur 6 : disengaged
+### Factor 6 : disengaged
 
 ```{r warning=FALSE, include=FALSE}
 # alpha de Cronbach
@@ -468,7 +470,7 @@ kable_styling(full_width = T) %>%
 column_spec(3, width = "12cm")
 ```
 
-### Facteur 7 : sexualized
+### Factor 7 : sexualized
 
 ```{r warning=FALSE, include=FALSE}
 # alpha de Cronbach
@@ -489,7 +491,7 @@ kable_styling(full_width = T) %>%
 column_spec(3, width = "12cm")
 ```
 
-### Facteur 8 : distrust
+### Factor 8 : distrust
 
 ```{r warning=FALSE, include=FALSE}
 # alpha de Cronbach
@@ -510,23 +512,23 @@ kable_styling(full_width = T) %>%
 column_spec(3, width = "12cm")
 ```
 
-### Calcul des facteurs
+### Calculations 
 
-Mistreated = ((6-trq1) + trq5 + trq6 + trq10 + trq12 + trq13 + trq15 + trq22 + trq26 + trq29 + trq30 + trq31 + trq33 + trq34 + trq35 + trq36 + trq38 + trq39 + trq44 + trq45 + trq46 + trq51 + trq52 + trq54 + trq55 + trq58 + trq59 + trq60 + trq63 + trq68 + trq75 + trq77 + trq78) / 33
+**Mistreated** = ((6-trq1) + trq5 + trq6 + trq10 + trq12 + trq13 + trq15 + trq22 + trq26 + trq29 + trq30 + trq31 + trq33 + trq34 + trq35 + trq36 + trq38 + trq39 + trq44 + trq45 + trq46 + trq51 + trq52 + trq54 + trq55 + trq58 + trq59 + trq60 + trq63 + trq68 + trq75 + trq77 + trq78) / 33
 
-Protective = (trq1 + trq3 + trq4 + trq7 + trq19 + trq21 + trq23 + trq28 + trq40 + trq42 + trq47 + trq49 + trq53 + trq64 + trq65 + trq66 + trq67 + trq69 + trq71 + trq74 + trq76 + trq79) / 22
+**Protective** = (trq1 + trq3 + trq4 + trq7 + trq19 + trq21 + trq23 + trq28 + trq40 + trq42 + trq47 + trq49 + trq53 + trq64 + trq65 + trq66 + trq67 + trq69 + trq71 + trq74 + trq76 + trq79) / 22
 
-Anger = (trq2 + trq8 + trq12 + trq15 + trq24 + trq25 + trq27 + trq29 + trq37 + trq39 + trq41 + trq43 + trq44 + trq45 + trq48 + trq55 + trq57) / 17
+**Anger** = (trq2 + trq8 + trq12 + trq15 + trq24 + trq25 + trq27 + trq29 + trq37 + trq39 + trq41 + trq43 + trq44 + trq45 + trq48 + trq55 + trq57) / 17
 
-Boredom = ((6-trq1) + (6-trq3) + trq8 + trq9 + trq10 + trq16 + trq18 + trq22 + trq25 + trq31 + trq36 + trq52 + trq68 + trq75) / 14
+**Boredom** = ((6-trq1) + (6-trq3) + trq8 + trq9 + trq10 + trq16 + trq18 + trq22 + trq25 + trq31 + trq36 + trq52 + trq68 + trq75) / 14
 
-Loss of professional distance = (trq56 + trq66 + trq67 + trq69 + trq71 + trq72 + trq73 + trq76 + trq77 + trq79) / 10
+**Loss of professional distance** = (trq56 + trq66 + trq67 + trq69 + trq71 + trq72 + trq73 + trq76 + trq77 + trq79) / 10
 
-Disengaged = (trq60 + trq70 + trq75 + trq78) / 4
+**Disengaged** = (trq60 + trq70 + trq75 + trq78) / 4
 
-Sexualized = (trq7 + trq17 + trq32 + trq50 + trq56 + trq61 + trq71 + trq76) / 8
+**Sexualized** = (trq7 + trq17 + trq32 + trq50 + trq56 + trq61 + trq71 + trq76) / 8
 
-Distrust = (trq11 + trq33 + trq41 + trq55) / 4
+**Distrust** = (trq11 + trq33 + trq41 + trq55) / 4
 
 ```{r}
 mistreated <- ((6-trq1) + trq5 + trq6 + trq10 + trq12 + trq13 + trq15 + trq22 + trq26 + trq29 + trq30 + trq31 + trq33 + trq34 + trq35 + trq36 + trq38 + trq39 + trq44 + trq45 + trq46 + trq51 + trq52 + trq54 + trq55 + trq58 + trq59 + trq60 + trq63 + trq68 + trq75 + trq77 + trq78) / 33
@@ -560,6 +562,90 @@ facto8_varimax_max <- round(facto8_varimax_max,2)
 facto8_varimax_table <- data.frame(Variable=facto8_varimax_names, Mean=facto8_varimax_mean, SD=facto8_varimax_sd, Min=facto8_varimax_min, Max = facto8_varimax_max)
 ```
 
+### Descriptive statistics 
+
 ```{r statdescfacto8varimax, echo=FALSE}
 kbl(facto8_varimax_table, caption = "Descriptive statistics")
+```
+
+### Distributions
+
+```{r, echo = FALSE, fig$ref(mistreated)}
+hist(mistreated,
+main="Mistreated",
+xlab="Mistreated",
+ylab="Frequency",
+border="black",
+col="grey",
+xlim=c(1,5))
+```
+
+```{r, echo = FALSE, fig$ref(protective)}
+hist(protective,
+main="Protective",
+xlab="protective",
+ylab="Frequency",
+border="black",
+col="grey",
+xlim=c(1,5))
+```
+
+```{r, echo = FALSE, fig$ref(anger)}
+hist(anger,
+main="Anger",
+xlab="Anger",
+ylab="Frequency",
+border="black",
+col="grey",
+xlim=c(1,5))
+```
+
+```{r, echo = FALSE, fig$ref(boredom)}
+hist(boredom,
+main="Boredom",
+xlab="Boredom",
+ylab="Frequency",
+border="black",
+col="grey",
+xlim=c(1,5))
+```
+
+```{r, echo = FALSE, fig$ref(lossofprofessionaldistance)}
+hist(lossofprofessionaldistance,
+main="Loss of professional distance",
+xlab="Loss of professional distance",
+ylab="Frequency",
+border="black",
+col="grey",
+xlim=c(1,5))
+```
+
+```{r, echo = FALSE, fig$ref(disengaged)}
+hist(disengaged,
+main="Disengaged",
+xlab="Disengaged",
+ylab="Frequency",
+border="black",
+col="grey",
+xlim=c(1,5))
+```
+
+```{r, echo = FALSE, fig$ref(sexualized)}
+hist(sexualized,
+main="Sexualized",
+xlab="Sexualized",
+ylab="Frequency",
+border="black",
+col="grey",
+xlim=c(1,5))
+```
+
+```{r, echo = FALSE, fig$ref(distrust)}
+hist(distrust,
+main="Distrust",
+xlab="Distrust",
+ylab="Frequency",
+border="black",
+col="grey",
+xlim=c(1,5))
 ```
