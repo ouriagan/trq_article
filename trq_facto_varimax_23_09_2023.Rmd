@@ -1,15 +1,15 @@
 ---
 title: 'TRQ : structures factorielles'
 author: "Louis De Page et Benjamin Thiry"
-date: "2023-02-23"
+date: "2023-09-23"
 output:
-  html_document:
-    df_print: paged
-    toc: yes
   pdf_document:
     toc: yes
     toc_depth: 3
     df_print: kable
+  html_document:
+    df_print: paged
+    toc: yes
   word_document:
     toc: yes
 ---
@@ -78,8 +78,8 @@ Le Very Simple Structure criterion propose une solution à 3 voire 4 facteurs.
 [n_factors](https://easystats.github.io/parameters/reference/n_factors.html) utilise 14 méthodes pour proposer la solution factorielle la plus fréquemment proposée :
 
 ```{r}
-# n_factors_varimax_results <- n_factors(items.df, type = "FA", rotation = "varimax")
-#plot(n_factors_varimax_results)
+n_factors_varimax_results <- n_factors(items.df, type = "FA", rotation = "varimax")
+plot(n_factors_varimax_results)
 ```
 
 ## 1 facteur
@@ -1946,7 +1946,7 @@ kable_styling(full_width = T) %>%
 column_spec(3, width = "12cm")
 ```
 
-### Facteur 9 : rivaltry
+### Facteur 9 : rivalry
 
 ```{r}
 kbl(facto9varimax_9table_ord, booktabs = T) %>%
@@ -2373,7 +2373,7 @@ ggplot(comparaisonvarimax.df) +
  ylim(0, 1)
 ```
 
-## Corrélations entre les facteurs avec variation varimax pour 8 niveaux
+## Corrélations entre les facteurs avec variation varimax pour 10 niveaux
 
 ```{r}
 # 8 niveaux
@@ -2382,170 +2382,25 @@ facto8_varimax_scores.df <- data.frame(scores1_varimax_1, scores2_varimax_1, sco
 
 facto8_varimax_cor_scores <- round(cor(facto8_varimax_scores.df, use = "complete.obs"),2)
 
+# 10 niveaux
+
+facto10_varimax_scores.df <- data.frame(scores1_varimax_1, scores2_varimax_1, scores2_varimax_2, scores3_varimax_1, scores3_varimax_2, scores3_varimax_3, scores4_varimax_1, scores4_varimax_2, scores4_varimax_3, scores4_varimax_4, scores5_varimax_1, scores5_varimax_2, scores5_varimax_3, scores5_varimax_4, scores5_varimax_5, scores6_varimax_1, scores6_varimax_2, scores6_varimax_3, scores6_varimax_4, scores6_varimax_5, scores6_varimax_6, scores7_varimax_1, scores7_varimax_2, scores7_varimax_3, scores7_varimax_4, scores7_varimax_5, scores7_varimax_6, scores7_varimax_7, scores8_varimax_1, scores8_varimax_2, scores8_varimax_3, scores8_varimax_4, scores8_varimax_5, scores8_varimax_6, scores8_varimax_7, scores8_varimax_8, scores9_varimax_1, scores9_varimax_2, scores9_varimax_3, scores9_varimax_4, scores9_varimax_5, scores9_varimax_6, scores9_varimax_7, scores9_varimax_8, scores9_varimax_9, scores10_varimax_1, scores10_varimax_2, scores10_varimax_3, scores10_varimax_4, scores10_varimax_5, scores10_varimax_6, scores10_varimax_7, scores10_varimax_8, scores10_varimax_9, scores10_varimax_10)
+
+facto10_varimax_cor_scores <- round(cor(facto8_varimax_scores.df, use = "complete.obs"),2)
+
+
 
 #kable(facto8_varimax_cor_scores)
  
 # Créer un fichier excel avec les corrélations entre chaque facteur
-# wb_varimax8 <- createWorkbook()
-# addWorksheet(wb_varimax8, "Correlations")
-# writeData(wb_varimax11, "Correlations", facto11_varimax_cor_scores, rowNames = TRUE)
-#saveWorkbook(wb_varimax11, "correlationsfacto11varimax22092023.xlsx")
+# wb_varimax10_23_09_2023 <- createWorkbook()
+# addWorksheet(wb_varimax10_23_09_2023, "Correlations")
+# writeData(wb_varimax10_23_09_2023, "Correlations", facto10_varimax_cor_scores, rowNames = TRUE)
+# saveWorkbook(wb_varimax10_23_09_2023, "correlations")
 ```
-Ce [fichier excel](https://1drv.ms/x/s!AsF5FHJubO7zum42Toj2tN_djAJN?e=9AKxXo) présente la matrice de corrélations de tous les scores factoriels pour les 11 niveaux.
+
+Ce [fichier excel](https://1drv.ms/x/s!AsF5FHJubO7zvSoGZUUcQQ0Nb8SF?e=HAz2KC) présente la matrice de corrélations de tous les scores factoriels pour les 10 niveaux.
 
 # Diagramme
 
-```{r}
-mermaid("
-flowchart TD
-
-scores1_varimax_1[F1. Neg CT]
-
-subgraph Level2[ ]
-    scores2_varimax_1[F1. Neg CT]
-    scores2_varimax_2[F2. Pos CT]
-end
-
-subgraph Level3[ ]
-    scores3_varimax_1[F1. Neg CT]
-    scores3_varimax_2[F2. Pos CT]
-    scores3_varimax_3[F3. Anger]
-end
-
-subgraph Level4[ ]
-    scores4_varimax_1[F1. Neg CT]
-    scores4_varimax_2[F2. Pos CT]
-    scores4_varimax_3[F3. Anger]
-    %% Colère
-    scores4_varimax_4[F4. Loss of bounderies]
-    %% Perte distance professionnelle
-end
-
-subgraph Level5[ ]
-    scores5_varimax_1[F1. Neg CT]
-    scores5_varimax_2[F2. Pos CT]
-    scores5_varimax_3[F3. Anger]
-    scores5_varimax_4[F4. Boredom]
-    %% Ennui
-    scores5_varimax_5[F5. Loss of bounderies]
-end
-
-subgraph Level6[ ]
-    scores6_varimax_1[F1. Neg CT]
-    scores6_varimax_2[F2. Pos CT]
-    scores6_varimax_3[F3. Anger]
-    scores6_varimax_4[F4. Boredom]
-    scores6_varimax_5[F5. Loss of bounderies]
-    scores6_varimax_6[????]
-
-end
-
-subgraph Level7[ ]
-    scores7_varimax_1[F1. Neg CT]
-    scores7_varimax_2[F2. Pos CT]
-    scores7_varimax_3[F3. Anger]
-    scores7_varimax_4[F4. Boredom]
-    scores7_varimax_5[F5. Loss of bounderies]
-    scores7_varimax_6[F6. Sexualized]
-    scores7_varimax_7[F7. Gloom]
-    %% Morosité
-end
-
-subgraph Level8[ ]
-    scores8_varimax_1[F1. Neg CT]
-    scores8_varimax_2[F2. Pos CT]
-    scores8_varimax_3[F3. Anger]
-    scores8_varimax_4[F4. Boredom***]
-    scores8_varimax_5[F5. Loss of bounderies]
-    scores8_varimax_6[F6. Sexualized]
-    scores8_varimax_7[F7. Avoidance]
-    scores8_varimax_8[F8. Distrust]
-end
-
-subgraph Level9[ ]
-    scores9_varimax_1[F1. Neg CT]
-    scores9_varimax_2[F2. Pos CT]
-    scores9_varimax_3[F3. Anger]
-    scores9_varimax_4[F4. Boredom***]
-    scores9_varimax_5[F5. Loss of bounderies]
-    scores9_varimax_6[F6. Sexualized]
-    scores9_varimax_7[F7. Avoidance]
-    scores9_varimax_8[F8. Distrust]
-    scores9_varimax_9[F9. Rivalry]
-end
-
-subgraph Level10[ ]
-    scores10_varimax_1[F1. Neg CT]
-    scores10_varimax_2[F2. Pos CT]
-    scores10_varimax_3[F3. Anger]
-    scores10_varimax_4[F4. Boredom***]
-    scores10_varimax_5[F5. Loss of bounderies]
-    scores10_varimax_6[F6. Avoidance]
-    scores10_varimax_7[F7. Sexualized]
-    scores10_varimax_8[F8. Distrust]
-    scores10_varimax_9[F9. Overwhelmed]
-    scores10_varimax_10[F10. Jealousy]
-end
-
-scores1_varimax_1 -- 1 ---scores2_varimax_1
-scores2_varimax_1 -- 0.81 ---scores3_varimax_1
-scores2_varimax_2 -- 1 ---scores3_varimax_2
-scores2_varimax_1 -- 0.67 ---scores3_varimax_3
-scores3_varimax_1 -- 0.99 ---scores4_varimax_1
-scores3_varimax_2 -- 0.93 ---scores4_varimax_2
-scores3_varimax_3 -- 0.97 ---scores4_varimax_3
-scores3_varimax_2 -- 0.42 ---scores4_varimax_4
-scores4_varimax_1 -- 0.79 ---scores5_varimax_1
-scores4_varimax_2 -- 1 ---scores5_varimax_2
-scores4_varimax_3 -- 1 ---scores5_varimax_3
-scores4_varimax_1 -- 0.67 ---scores5_varimax_4
-scores4_varimax_4 -- 0.95 ---scores5_varimax_5
-scores5_varimax_1 -- 0.99 ---scores6_varimax_1
-scores5_varimax_2 -- 0.98 ---scores6_varimax_2
-scores5_varimax_3 -- 0.96 ---scores6_varimax_3
-scores5_varimax_4 -- 0.97 ---scores6_varimax_4
-scores5_varimax_5 -- 0.92 ---scores6_varimax_5
-scores5_varimax_5 -- 0.41 ---scores6_varimax_6
-scores6_varimax_1 -- 0.98 ---scores7_varimax_1
-scores6_varimax_2 -- 0.99 ---scores7_varimax_2
-scores6_varimax_3 -- 1 ---scores7_varimax_3
-scores6_varimax_4 -- 0.95 ---scores7_varimax_4
-scores6_varimax_5 -- 0.5 ---scores7_varimax_5
-scores6_varimax_6 -- 0.4 ---scores7_varimax_5
-scores6_varimax_5 -- 0.9 ---scores7_varimax_6
-scores6_varimax_4 -- 0.31 ---scores7_varimax_7
-scores6_varimax_6 -- -0.86 ---scores7_varimax_7
-scores7_varimax_1 -- 0.99 ---scores8_varimax_1
-scores7_varimax_2 -- 0.99 ---scores8_varimax_2
-scores7_varimax_3 -- 0.98 ---scores8_varimax_3
-scores7_varimax_4 -- 0.83 ---scores8_varimax_4
-scores7_varimax_7 -- 0.51 ---scores8_varimax_4
-scores7_varimax_5 -- 0.97 ---scores8_varimax_5
-scores7_varimax_6 -- 0.95 ---scores8_varimax_6
-scores7_varimax_4 -- 0.55 ---scores8_varimax_7
-scores7_varimax_7 -- -0.62 ---scores8_varimax_7
-scores7_varimax_7 -- -0.57 ---scores8_varimax_8
-scores8_varimax_1 -- 0.99 ---scores9_varimax_1
-scores8_varimax_2 -- 1 ---scores9_varimax_2
-scores8_varimax_3 -- 1 ---scores9_varimax_3
-scores8_varimax_4 -- 0.99 ---scores9_varimax_4
-scores8_varimax_5 -- 0.94 ---scores9_varimax_5
-scores8_varimax_6 -- 1 ---scores9_varimax_6
-scores8_varimax_7 -- 0.99 ---scores9_varimax_7
-scores8_varimax_8 -- 0.99 ---scores9_varimax_8
-scores8_varimax_5 -- 0.35 ---scores9_varimax_9
-scores9_varimax_1 -- 1 ---scores10_varimax_1
-scores9_varimax_2 -- 1 ---scores10_varimax_2
-scores9_varimax_3 -- 0.94 ---scores10_varimax_3
-scores9_varimax_4 -- 1 ---scores10_varimax_4
-scores9_varimax_5 -- 0.92 ---scores10_varimax_5
-scores9_varimax_7 -- 1 ---scores10_varimax_6
-scores9_varimax_6 -- 0.91 ---scores10_varimax_7
-scores9_varimax_8 -- 0.89 ---scores10_varimax_8
-scores9_varimax_5 -- 0.39 ---scores10_varimax_9
-scores9_varimax_8 -- -0.44 ---scores10_varimax_9
-scores9_varimax_9 -- -0.31 ---scores10_varimax_9
-scores9_varimax_9 -- 0.91 ---scores10_varimax_10
-")
-```
-
+![](trq_diagramme_23_09_2023.png)
